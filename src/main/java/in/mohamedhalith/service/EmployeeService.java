@@ -17,6 +17,7 @@ import in.mohamedhalith.validator.EmployeeValidator;
 @Service
 public class EmployeeService {
 
+	// Instances of Classes needed in the service
 	@Autowired
 	EmployeeRepository employeeDAO;
 	@Autowired
@@ -35,7 +36,7 @@ public class EmployeeService {
 	 * This method is used to return the list of employees
 	 * 
 	 * @return - List of employees
-	 * @throws ServiceException If database related exceptions
+	 * @throws ServiceException If database related exceptions occurs
 	 */
 	public Iterable<Employee> getEmployeeList() throws ServiceException {
 		try {
@@ -48,11 +49,13 @@ public class EmployeeService {
 	/**
 	 * This method is used to get employee from the DAO.
 	 * 
+	 * <p>
 	 * Returns null if employee not found
 	 * 
 	 * @param employeeId Employee id provided by the organization
 	 * @return Employee - Details of employee
-	 * @throws ServiceException    When database related errors occurs
+	 * @throws ServiceException    When database related errors occurs (or) output
+	 *                             is null(unable to fetch output)
 	 * @throws ValidationException If null,empty or invalid type of input is
 	 *                             provided
 	 */
@@ -62,6 +65,8 @@ public class EmployeeService {
 		employee = employeeDAO.findByEmployeeId(employeeId);
 		// If employee is null, no data is found for given id
 		if (employee == null) {
+			// No employee is found with given id .
+			// An exception is raised to indicate it
 			throw new ServiceException("Invalid Employee Id");
 		}
 		return employee;
@@ -70,6 +75,7 @@ public class EmployeeService {
 	/**
 	 * This method is used to get id of an employee when username is given as input
 	 * 
+	 * <p>
 	 * Returns an integer if valid username is given and exception is thrown if it
 	 * is null
 	 * 
@@ -85,6 +91,7 @@ public class EmployeeService {
 		try {
 			employeeId = employeeDAO.findEmployeeId(username);
 		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, "Unable to get employee");
 		}
 		// If employee is null, no data is found for given username
@@ -97,6 +104,7 @@ public class EmployeeService {
 	/**
 	 * This method is used to verify an employee by username and password
 	 * 
+	 * <p>
 	 * Return boolean true for valid username and password and false for invalid
 	 * details
 	 * 
@@ -113,8 +121,10 @@ public class EmployeeService {
 		try {
 			employee = employeeDAO.findByUsernameAndPasswordAndRole(username, password, role);
 		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, "Unable to verify user");
 		}
+		// Verifies whether employee obtained from dao is null
 		if (employee != null) {
 			isValid = true;
 		}
@@ -123,8 +133,11 @@ public class EmployeeService {
 
 	/**
 	 * This method is used to add any new recruit or employee to the organization's
-	 * records. Boolean value of true is returned if the employee is added
-	 * successfully without any errors and false otherwise.
+	 * records.
+	 * 
+	 * <p>
+	 * Boolean value of true is returned if the employee is added successfully
+	 * without any errors and false otherwise.
 	 * 
 	 * @param employee Details of employee who is to be added
 	 * @return boolean - True only if all the details of the employee are valid and
@@ -145,9 +158,11 @@ public class EmployeeService {
 			employeeDAO.save(employee);
 			isAdded = leaveBalanceService.addLeaveBalance(employee.getEmployeeId());
 		} catch (Exception e) {
-			throw new ServiceException(e, "Unable to add employee");
+			// Exceptions faced during the query is captured and handled as ServiceException
+			throw new ServiceException(e, errorMessage);
 		}
 		// If isAdded is false, performed operation is not expected operation
+		// Hence Exception is thrown to indicate it
 		if (!isAdded) {
 			throw new ServiceException(errorMessage);
 		}
@@ -155,9 +170,11 @@ public class EmployeeService {
 	}
 
 	/**
-	 * This method is used to remove employee from the organization. Returns true if
-	 * the employee is removed successfully from the records and exception is thrown
-	 * with appropriate message.
+	 * This method is used to remove employee from the organization.
+	 * 
+	 * <p>
+	 * Returns true if the employee is removed successfully from the records and
+	 * exception is thrown with appropriate message.
 	 * 
 	 * @param employeeId Employee id provided by the organization
 	 * @return boolean - True only if the employee is removed successfully
@@ -171,10 +188,12 @@ public class EmployeeService {
 		try {
 			rows = employeeDAO.remove(employeeId);
 		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, "Unable to remove employee");
 		}
 		boolean isRemoved = false;
 		// If isAdded is false, performed operation is not expected operation
+		// Hence Exception is thrown to indicate it
 		if (rows != 1) {
 			throw new ServiceException("Unable to remove employee");
 		}
@@ -185,34 +204,61 @@ public class EmployeeService {
 	/**
 	 * This method is used to check whether employee id is present in the records
 	 * 
+	 * <p>
+	 * Returns true if it is already present and false otherwise
+	 * 
 	 * @param employeeId Employee id provided by the organization that is to be
 	 *                   verified
 	 * @return Integer - (Database)id of the employee if valid input is
 	 *         provided,null otherwise
+	 * @throws ServiceException When Database related exceptions occur
 	 */
-	public Integer exists(int employeeId) {
-		return employeeDAO.exists(employeeId);
+	public Integer exists(int employeeId) throws ServiceException {
+		try {
+			return employeeDAO.exists(employeeId);
+		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
+			throw new ServiceException("Unable to verify employee id");
+		}
 	}
 
 	/**
 	 * This method is used to check whether mobile number is present in the records
 	 * 
+	 * <p>
+	 * Returns true if it is already present and false otherwise
+	 * 
 	 * @param mobileNumber Mobile number of the employee that is to be verified
 	 * @return Integer - (Database)id of the employee if valid input is
 	 *         provided,null otherwise
+	 * @throws ServiceException When Database related exception occurs
 	 */
-	public Integer exists(long mobileNumber) {
-		return employeeDAO.exists(mobileNumber);
+	public Integer exists(long mobileNumber) throws ServiceException {
+		try {
+			return employeeDAO.exists(mobileNumber);
+		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
+			throw new ServiceException("Unable to verify mobile number");
+		}
 	}
 
 	/**
-	 * This method is used to check whether email id is present in the records
+	 * This method is used to check whether email id is present in the records.
+	 * 
+	 * <p>
+	 * Returns true if it is already present and false otherwise
 	 * 
 	 * @param email Email id of the employee that is to be verified
 	 * @return Integer - (Database)id of the employee if valid input is
 	 *         provided,null otherwise
+	 * @throws ServiceException When database related exception occurs
 	 */
-	public Integer exists(String email) {
-		return employeeDAO.exists(email);
+	public Integer exists(String email) throws ServiceException {
+		try {
+			return employeeDAO.exists(email);
+		} catch (Exception e) {
+			// Exceptions faced during the query is captured and handled as ServiceException
+			throw new ServiceException("Unable to verify email id");
+		}
 	}
 }

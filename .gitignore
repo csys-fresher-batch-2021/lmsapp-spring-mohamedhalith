@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+/Backup/
+/.mvn/
+/Class Diagram.ucls
+/mvnw
+/mvnw.cmd

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import in.mohamedhalith.constant.FieldConstants;
 import in.mohamedhalith.dto.AuthDTO;
 import in.mohamedhalith.dto.LoginDTO;
 import in.mohamedhalith.exception.ServiceException;
@@ -22,28 +23,31 @@ import in.mohamedhalith.validator.LoginValidator;
 
 @RestController
 public class AuthController {
+
 	@Autowired
 	EmployeeService employeeService;
 	@Autowired
 	LoginValidator loginValidator;
+
 	@PostMapping("LoginServlet")
-	public AuthDTO login(@RequestBody LoginDTO user,HttpServletRequest request) throws ServiceException, ValidationException {
+	public AuthDTO login(@RequestBody LoginDTO user, HttpServletRequest request)
+			throws ServiceException, ValidationException {
 		boolean validUser = loginValidator.verifyCredentials(user);
 		AuthDTO loggedIn = null;
 		int employeeId;
 		if (validUser) {
 			employeeId = employeeService.getEmployeeId(user.getUsername());
 			Employee employee = employeeService.getEmployee(employeeId);
-			loggedIn = new AuthDTO(employee.getName(),employeeId,user.getRole());
+			loggedIn = new AuthDTO(employee.getName(), employeeId, user.getRole());
 			HttpSession session = request.getSession();
 			session.setAttribute("ROLE", user.getRole());
 			session.setAttribute("LOGGEDIN_USERNAME", user.getUsername());
-			session.setAttribute("employee", employee);
+			session.setAttribute(FieldConstants.EMPLOYEE_ID, employee);
 			session.setAttribute("employeeId", employee.getEmployeeId());
 			return loggedIn;
 		}
 		throw new ValidationException("Invalid credentials");
-		
+
 	}
 
 	@GetMapping("LogoutServlet")
