@@ -17,6 +17,7 @@ import in.mohamedhalith.validator.LeaveRequestValidator;
 @Service
 public class LeaveRequestService {
 
+	// Instances of Classes needed in this service class
 	@Autowired
 	LeaveRequestValidator leaveRequestValidator;
 	@Autowired

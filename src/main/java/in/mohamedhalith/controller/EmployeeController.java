@@ -41,18 +41,9 @@ public class EmployeeController {
 	public ResponseEntity<Message> addEmployee(@RequestBody Employee employee)
 			throws ServiceException, ValidationException {
 		Message message = new Message();
-		try {
-			employeeService.addEmployee(employee);
-			message.setInfoMessage("Successfully added employee");
-			return new ResponseEntity<>(message, HttpStatus.OK);
-		} catch (ServiceException e) {
-			e.printStackTrace();
-			message.setErrorMessage(e.getMessage());
-			return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
-		} catch (ValidationException e) {
-			message.setErrorMessage(e.getMessage());
-			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-		}
+		employeeService.addEmployee(employee);
+		message.setInfoMessage("Successfully added employee");
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@GetMapping("EmployeeDetailsServlet")
@@ -69,20 +60,13 @@ public class EmployeeController {
 	}
 
 	@GetMapping("RemoveEmployeeServlet")
-	public ResponseEntity<Message> remove(@Param(EMPLOYEE_ID) int employeeId) {
+	public ResponseEntity<Message> remove(@Param(EMPLOYEE_ID) int employeeId)
+			throws ValidationException, ServiceException {
 		Message message = new Message();
-		try {
-			boolean isRemoved = employeeService.removeEmployee(employeeId);
-			if (isRemoved) {
-				message.setInfoMessage("Successfully removed employee");
-			}
-			return new ResponseEntity<>(message, HttpStatus.OK);
-		} catch (ValidationException e) {
-			message.setErrorMessage(e.getMessage());
-			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-		} catch (ServiceException e) {
-			message.setErrorMessage(e.getMessage());
-			return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+		boolean isRemoved = employeeService.removeEmployee(employeeId);
+		if (isRemoved) {
+			message.setInfoMessage("Successfully removed employee");
 		}
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 }

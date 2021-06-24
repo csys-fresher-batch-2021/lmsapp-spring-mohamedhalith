@@ -6,17 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import in.mohamedhalith.dao.LeaveRequestDAO;
+import in.mohamedhalith.exception.ValidationException;
+import in.mohamedhalith.validator.EmployeeValidator;
 
 @SpringBootTest
 class LmsApplicationTests {
 
 	@Autowired
-	LeaveRequestDAO validator;
+	EmployeeValidator validator;
 
 	@Test
 	void contextLoads() {
-		System.out.println(validator.findAll());
+		try {
+			System.out.println(validator.isEmployee(2382));
+		} catch (ValidationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		assertTrue(true);
 	}
 

@@ -24,11 +24,10 @@ public class EmployeeValidator {
 	/**
 	 * This method is used to verify whether the user is an employee or not
 	 * 
-	 * @param username
-	 * @throws ValidationException
-	 * @throws ServiceException
+	 * @param username username of the user
+	 * @throws ValidationException If the input is null,empty or in invalid format
 	 */
-	public void isEmployee(String username) throws ValidationException, ServiceException {
+	public void isEmployee(String username) throws ValidationException {
 		try {
 			employeeService.getEmployeeId(username);
 		} catch (ServiceException e) {
@@ -37,23 +36,24 @@ public class EmployeeValidator {
 	}
 
 	/**
-	 * This method is used to validate or verify given employee id
+	 * This method is used to validate or verify given id of the employee
 	 * 
-	 * @param employeeId
-	 * @return boolean
-	 * @throws ValidationException
+	 * <p>
+	 * Returns true if an employee is present with the given id
+	 * 
+	 * @param employeeId Id of the employee provided by the organization
+	 * @return boolean - True if an employee is present with the given id
+	 * @throws ValidationException When given input is null,empty or in invalid
+	 *                             format (or) no employee is found for given id
 	 */
 	public boolean isEmployee(int employeeId) throws ValidationException {
-		Employee employee = null;
 		try {
-			employee = employeeService.getEmployee(employeeId);
-			boolean isValid = false;
-			if (employee != null) {
-				isValid = true;
-			}
-			return isValid;
+			employeeService.getEmployee(employeeId);
+			return true;
 		} catch (ServiceException e) {
-			throw new ValidationException(e,INVALIDEMPLOYEE);
+			// ServiceException is handled as ValidationException since no employee is
+			// present for given id
+			throw new ValidationException(e, INVALIDEMPLOYEE);
 		}
 	}
 
@@ -61,27 +61,29 @@ public class EmployeeValidator {
 	 * This method is used to validates the fields of the employee and verifies
 	 * whether each of them is valid
 	 * 
-	 * @param employeeId
-	 * @throws ValidationException
+	 * @param employeeId Id of the employee given by the organization
+	 * @throws ValidationException If any input is found to be null,empty or in
+	 *                             invalid format
+	 * @throws ServiceException    When database related exceptions occur
 	 */
-	public void isValidEmployee(Employee employee) throws ValidationException {
+	public void isValidEmployee(Employee employee) throws ValidationException, ServiceException {
 		StringValidator.isValidName(employee.getName());
 		StringValidator.isValidEmail(employee.getEmail());
 		StringValidator.isValidPassword(employee.getPassword());
 		StringValidator.isValidUsername(employee.getUsername());
 		NumberValidator.isValidMobileNumber(employee.getMobileNumber());
-			Integer id = employeeService.exists(employee.getEmployeeId());
-			if (id != null) {
-				throw new ValidationException("Employee Id already exists");
-			}
-			id = employeeService.exists(employee.getMobileNumber());
-			if (id != null) {
-				throw new ValidationException("Mobile Number already exists");
-			}
-			id = employeeService.exists(employee.getEmail());
-			if (id != null) {
-				throw new ValidationException("Email Id already exists");
-			}
+		Integer id = employeeService.exists(employee.getEmployeeId());
+		if (id != null) {
+			throw new ValidationException("Employee Id already exists");
+		}
+		id = employeeService.exists(employee.getMobileNumber());
+		if (id != null) {
+			throw new ValidationException("Mobile Number already exists");
+		}
+		id = employeeService.exists(employee.getEmail());
+		if (id != null) {
+			throw new ValidationException("Email Id already exists");
+		}
 		DateValidator.isValidJoinedDate(employee.getJoinedDate());
 	}
 }
