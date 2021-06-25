@@ -106,4 +106,14 @@ public class LeaveBalanceImpl implements LeaveBalanceDAO {
 		return isUpdated;
 	}
 
+	/**
+	 * This method is used to increment leave balance of the employee. Method
+	 * executes a procedure which increases the allocated leave balance of an
+	 * employee
+	 */
+	public void allocateLeaveBalance() {
+		String sql = "CALL allocate_leavebalance()";
+		jdbcTemplate.update(sql);
+	}
+
 }
