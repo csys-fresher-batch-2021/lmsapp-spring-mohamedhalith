@@ -37,16 +37,18 @@ getAllRequests(null);
  * This method is used to cancel a leave request with leave id as reference
  */
 function cancel(leaveId) {
-	let url = "CancelRequestServlet?leaveId=" + leaveId;
-	axios.get(url).then(res => {
-		let data = res.data;
-		if (data) {
-			alert("Cancelled successfully");
-		} else {
-			alert("Failed to cancel");
-		}
-		getAllRequests(null);
-	}).catch(err => {
-		console.log(err.response.data);
-	});
+	if (window.confirm("Do you want to cancel this request?")) {
+		let url = "CancelRequestServlet?leaveId=" + leaveId;
+		axios.get(url).then(res => {
+			let data = res.data;
+			if (data) {
+				toastr.success("Cancelled successfully");
+			} else {
+				toastr.error("Failed to cancel");
+			}
+			getAllRequests(null);
+		}).catch(err => {
+			console.log(err.response.data.errorMessage);
+		});
+	}
 }

@@ -39,10 +39,12 @@ function removeEmployee() {
 	fetch(url).then(res => res.json()).then(res => {
 		let result = res;
 		if (result) {
-			alert("Successfully removed");
-			window.location.href = "listemployees.jsp";
+			toastr.success("Successfully removed");
+			setTimeout(function() {
+				window.location.href = "listemployees.jsp";
+			},1500);
 		} else {
-			alert("Failed to remove");
+			toastr.error("Failed to remove");
 		}
 	}).catch(err => {
 		console.log(err.data);

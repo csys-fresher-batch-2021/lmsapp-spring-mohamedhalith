@@ -17,7 +17,6 @@ import in.mohamedhalith.dto.AuthDTO;
 import in.mohamedhalith.dto.LoginDTO;
 import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
-import in.mohamedhalith.model.Employee;
 import in.mohamedhalith.service.EmployeeService;
 import in.mohamedhalith.validator.LoginValidator;
 
@@ -32,22 +31,15 @@ public class AuthController {
 	@PostMapping("LoginServlet")
 	public AuthDTO login(@RequestBody LoginDTO user, HttpServletRequest request)
 			throws ServiceException, ValidationException {
-		boolean validUser = loginValidator.verifyCredentials(user);
-		AuthDTO loggedIn = null;
-		int employeeId;
-		if (validUser) {
-			employeeId = employeeService.getEmployeeId(user.getUsername());
-			Employee employee = employeeService.getEmployee(employeeId);
-			loggedIn = new AuthDTO(employee.getName(), employeeId, user.getRole());
+		AuthDTO loggedIn  = employeeService.findByUsernameAndPassword(user);
+		if (loggedIn != null) {
 			HttpSession session = request.getSession();
 			session.setAttribute("ROLE", user.getRole());
 			session.setAttribute("LOGGEDIN_USERNAME", user.getUsername());
-			session.setAttribute(FieldConstants.EMPLOYEE_ID, employee);
-			session.setAttribute("employeeId", employee.getEmployeeId());
-			return loggedIn;
+			session.setAttribute("employee", loggedIn);
+			session.setAttribute(FieldConstants.EMPLOYEE_ID, loggedIn.getEmployeeId());
 		}
-		throw new ValidationException("Invalid credentials");
-
+		return loggedIn;
 	}
 
 	@GetMapping("LogoutServlet")

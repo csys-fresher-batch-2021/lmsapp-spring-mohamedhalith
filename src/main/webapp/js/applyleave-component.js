@@ -60,13 +60,15 @@ function apply() {
 	axios.post(url,leaveRequest).then(res=>{
 		let data = res.data;
 		if(data){
-			alert("Leave applied");
-			window.location.href="applyleave.jsp";
+			toastr.success("Leave applied");
+			setTimeout(function() {
+				window.location.href="applyleave.jsp";
+			},1500)
 		}else{
-			alert("Unable to apply leave");	
+			toastr.error("Unable to apply leave");	
 		}
 	}).catch(err=>{
-		console.log(err);
-		alert(err.data);
+		toastr.error(err.response.data.errorMessage);
+		console.log("Error code " + err.response.status);
 	});
 }

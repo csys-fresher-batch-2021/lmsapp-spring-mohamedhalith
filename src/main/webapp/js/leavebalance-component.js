@@ -6,7 +6,6 @@ function getLeaveBalance() {
 	let content = "";
 	fetch(url).then(res => res.json()).then(res => {
 		let leaveBalance = res;
-		console.log(leaveBalance);
 		content = "<tr><td>" +
 			leaveBalance.employee.name + "</td><td>" +
 			leaveBalance.employee.employeeId + "</td><td>" +
