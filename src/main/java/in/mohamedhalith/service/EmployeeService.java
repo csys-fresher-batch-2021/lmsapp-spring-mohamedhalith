@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 
 import in.mohamedhalith.constant.Role;
 import in.mohamedhalith.dao.EmployeeRepository;
+import in.mohamedhalith.dto.AuthDTO;
+import in.mohamedhalith.dto.LoginDTO;
 import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
 import in.mohamedhalith.model.Employee;
 import in.mohamedhalith.util.NumberValidator;
 import in.mohamedhalith.util.StringValidator;
 import in.mohamedhalith.validator.EmployeeValidator;
+import in.mohamedhalith.validator.LoginValidator;
 
 @Service
 public class EmployeeService {
@@ -22,6 +25,8 @@ public class EmployeeService {
 	EmployeeRepository employeeDAO;
 	@Autowired
 	EmployeeValidator employeeValidator;
+	@Autowired
+	LoginValidator loginValidator;
 	@Autowired
 	LeaveBalanceService leaveBalanceService;
 
@@ -114,21 +119,23 @@ public class EmployeeService {
 	 * @return boolean - True only if username,password and role are valid, false
 	 *         otherwise
 	 * @throws ServiceException When database related errors occurs
+	 * @throws ValidationException 
 	 */
-	public boolean findByUsernameAndPassword(String username, String password, String role) throws ServiceException {
-		boolean isValid = false;
-		Employee employee;
+	public AuthDTO findByUsernameAndPassword(LoginDTO user) throws ServiceException, ValidationException {
+		loginValidator.verifyCredentials(user);
 		try {
-			employee = employeeDAO.findByUsernameAndPasswordAndRole(username, password, role);
+			Employee employee = employeeDAO.findByUsernameAndPasswordAndRole(user.getUsername(), user.getPassword(), user.getRole());
+			AuthDTO loggedInUser;
+			if(employee != null) {
+				loggedInUser = new AuthDTO(employee.getName(),employee.getEmployeeId(),employee.getRole(),employee.getId());
+			}else {
+				throw new ValidationException("Invalid credentials");
+			}
+			return loggedInUser;
 		} catch (Exception e) {
 			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, "Unable to verify user");
 		}
-		// Verifies whether employee obtained from dao is null
-		if (employee != null) {
-			isValid = true;
-		}
-		return isValid;
 	}
 
 	/**

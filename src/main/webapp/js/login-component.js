@@ -16,27 +16,31 @@ function toggle() {
 }
 toggle();
 
-function login(){
+function login() {
 	event.preventDefault();
 	let username = document.querySelector("#username").value;
 	let password = document.querySelector("#password").value;
 	let role = document.querySelector('input[name="role"]:checked').value;
 	let url = "LoginServlet";
 	let user = {
-		"username" : username,
-		"password" : password,
-		"role" : role
+		"username": username,
+		"password": password,
+		"role": role
 	}
-	axios.post(url,user).then(res=>{
-		let data  = res.data;
+	axios.post(url, user).then(res => {
+		let data = res.data;
 		console.log(res);
-		if(data != null){
-			alert("Logged in successfully");
-			localStorage.setItem("LOGGED_IN_USER",user);
-			window.location.href="index.jsp";
+		if (data != null) {
+			toastr.success("Login successful");
+			localStorage.setItem("TOKEN", data.id);
+			data = JSON.stringify(data);
+			localStorage.setItem("LOGGED_IN_USER", data);
+			setTimeout(function() {
+				window.location.href = "index.jsp"; 
+			}, 1000);
 		}
-	}).catch(err=>{
-		console.log(err.response.data);
-		alert("invalid credentials");
+	}).catch(err => {
+		console.log(err);
+		toastr.error("Invalid credentials");
 	});
 }

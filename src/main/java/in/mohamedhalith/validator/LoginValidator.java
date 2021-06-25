@@ -33,19 +33,16 @@ public class LoginValidator {
 	 * @throws ValidationException
 	 * @throws ServiceException 
 	 */
-	public boolean verifyCredentials(LoginDTO user) throws ValidationException, ServiceException {
+	public void verifyCredentials(LoginDTO user) throws ValidationException {
 		String username = user.getUsername();
 		String password = user.getPassword();
 		String role = user.getRole();
-		boolean valid = false;
 		
 		StringValidator.isValidUsername(username);
 		StringValidator.isValidPassword(password);
 		StringValidator.isValidString(role);
-		if (role.equalsIgnoreCase(Role.EMPLOYEE.toString()) || role.equalsIgnoreCase(Role.MANAGER.toString())) {
-			// Verifies user name and password with employee list
-			valid = employeeService.findByUsernameAndPassword(username, password,role);
+		if (!role.equalsIgnoreCase(Role.EMPLOYEE.toString()) && !role.equalsIgnoreCase(Role.MANAGER.toString())) {
+			throw new ValidationException("Invalid credentials");
 		}
-		return valid;
 	}
 }

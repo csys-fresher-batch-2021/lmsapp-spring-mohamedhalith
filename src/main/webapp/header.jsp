@@ -4,13 +4,17 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-<link rel="stylesheet" href="assets/css/fontawesome.min.css">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet"
 	href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
 	integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ"
 	crossorigin="anonymous">
+<link rel="stylesheet" href="assets/css/toastr.css">
 <script src="assets/js/axios.min.js"></script>
+<script src="assets/js/jquery-1.9.1.min.js"></script>
+<script src="assets/js/jquery-migrate-1.2.1.min.js"></script>
+<script src="assets/js/toastr.js"></script>
+<script src="js/header-component.js"></script>
 <header>
 	<c:set var="username" value="${sessionScope.LOGGEDIN_USERNAME}"></c:set>
 	<c:set var="role" value="${sessionScope.ROLE }"></c:set>
@@ -55,7 +59,7 @@
 				<ul class="navbar-nav ml-auto mt-2 mt-lg-0" >
 					<li class="nav-item active"><a class="nav-link" href="#"
 						>Welcome ${employee.getName()}</a></li>
-					<li class="nav-item"><a class="nav-link" href="LogoutServlet"
+					<li class="nav-item"><a class="nav-link" href="" onclick="logout()"
 						>Logout</a></li>
 				</ul>
 			</c:if>

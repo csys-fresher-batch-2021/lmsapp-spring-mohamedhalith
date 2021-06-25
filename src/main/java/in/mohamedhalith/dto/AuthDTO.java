@@ -10,5 +10,6 @@ public class AuthDTO {
 	private String name;
 	private int employeeId;
 	private String role;
+	private int id;
 
 }

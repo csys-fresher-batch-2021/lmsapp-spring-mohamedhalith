@@ -1,8 +1,8 @@
 /**
-	* This function sets the value of the joined date field also add boundary condition 
-	* to the joined date field. Limits maximum to present day and minimum to 30 days
-	* from present day. In other words, admin cannot add an employee joined before a month
-	*/
+	This function sets the value of the joined date field also add boundary condition 
+	to the joined date field. Limits maximum to present day and minimum to 30 days
+	from present day. In other words, admin cannot add an employee joined before a month
+*/
 function setDate() {
 	let joinedDate = document.getElementById("joinedDate");
 	let today = new Date();
@@ -50,6 +50,11 @@ function setUsername() {
 	document.querySelector("#password").value = password;
 }
 
+/**
+	This method is used to add an employee. All the details from the form is 
+	collected and converted into a Javascript object. Data is sent to the backend using
+	axios method and response is obtained
+ */
 function add() {
 	event.preventDefault();
 	let url = "AddEmployeeServlet";
@@ -70,14 +75,14 @@ function add() {
 		"password": password,
 		"joinedDate": joinedDate
 	}
-	console.log(employee);
 	axios.post(url, employee).then(res => {
 		let data = res.data;
 		if (data) {
-			alert("Employee Added Successfully");
-			window.location.href = "listemployees.jsp";	
+			toastr.success("Employee Added Successfully");
+			window.location.href = "listemployees.jsp";
 		}
 	}).catch(err => {
-		console.log(err.response.data);
+		console.log(err.response.status);
+		toastr.error(err.response.data.errorMessage);
 	});
 }
