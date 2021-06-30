@@ -3,10 +3,12 @@ package in.mohamedhalith.service;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import in.mohamedhalith.constant.Role;
 import in.mohamedhalith.dao.EmployeeRepository;
+import in.mohamedhalith.dao.LeaveBalanceDAO;
 import in.mohamedhalith.dto.AuthDTO;
 import in.mohamedhalith.dto.LoginDTO;
 import in.mohamedhalith.exception.ServiceException;
@@ -28,7 +30,7 @@ public class EmployeeService {
 	@Autowired
 	LoginValidator loginValidator;
 	@Autowired
-	LeaveBalanceService leaveBalanceService;
+	LeaveBalanceDAO leaveBalanceDAO;
 
 	/**
 	 * Constructor is made private to prevent creating object of the class
@@ -132,7 +134,7 @@ public class EmployeeService {
 				throw new ValidationException("Invalid credentials");
 			}
 			return loggedInUser;
-		} catch (Exception e) {
+		} catch (DataAccessException e) {
 			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, "Unable to verify user");
 		}
@@ -156,14 +158,17 @@ public class EmployeeService {
 	public boolean addEmployee(Employee employee) throws ServiceException, ValidationException {
 		employee.setModifiedTime(LocalDateTime.now());
 		String role = Role.EMPLOYEE.toString().toLowerCase();
+		// Default values for employees
 		employee.setRole(role);
+		employee.setStatus(true);
+		
 		employeeValidator.isValidEmployee(employee);
 		String errorMessage = "Unable to add employee";
 		// If isAdded is false, performed operation is not expected operation
 		boolean isAdded;
 		try {
 			employeeDAO.save(employee);
-			isAdded = leaveBalanceService.addLeaveBalance(employee.getEmployeeId());
+			isAdded = leaveBalanceDAO.save(employee.getEmployeeId());
 		} catch (Exception e) {
 			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException(e, errorMessage);
@@ -204,7 +209,7 @@ public class EmployeeService {
 		if (rows != 1) {
 			throw new ServiceException("Unable to remove employee");
 		}
-		isRemoved = leaveBalanceService.remove(employeeId);
+		isRemoved = leaveBalanceDAO.remove(employeeId);
 		return isRemoved;
 	}
 

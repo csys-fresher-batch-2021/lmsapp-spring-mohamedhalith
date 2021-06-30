@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import in.mohamedhalith.dao.LeaveBalanceDAO;
 import in.mohamedhalith.dao.LeaveRequestDAO;
 import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
@@ -25,7 +26,7 @@ public class LeaveRequestService {
 	@Autowired
 	LeaveRequestDAO leaveRequestRepo;
 	@Autowired
-	LeaveBalanceService leaveBalanceService;
+	LeaveBalanceDAO leaveBalanceDAO;
 
 	/**
 	 * Constructor is made private to prevent creating object of the class
@@ -87,7 +88,7 @@ public class LeaveRequestService {
 
 		leaveRequestValidator.isValidRequest(leaveRequest, employeeId);
 		try {
-			leaveBalanceService.update(employeeId, leaveRequest);
+			leaveBalanceDAO.update(employeeId, leaveRequest);
 			return leaveRequestRepo.save(leaveRequest);
 		} catch (Exception e) {
 			throw new ServiceException(e, "Unable to apply for leave");
