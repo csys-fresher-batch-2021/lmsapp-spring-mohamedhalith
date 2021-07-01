@@ -1,11 +1,14 @@
 package in.mohamedhalith.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import in.mohamedhalith.constant.Role;
+import in.mohamedhalith.converter.EmployeeBeanConverter;
+import in.mohamedhalith.csv.EmployeeBean;
 import in.mohamedhalith.dao.EmployeeRepository;
 import in.mohamedhalith.dto.AuthDTO;
 import in.mohamedhalith.dto.LoginDTO;
@@ -13,7 +16,9 @@ import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
 import in.mohamedhalith.model.Employee;
 import in.mohamedhalith.util.NumberValidator;
+import in.mohamedhalith.util.PasswordUtil;
 import in.mohamedhalith.util.StringValidator;
+import in.mohamedhalith.util.UsernameUtil;
 import in.mohamedhalith.validator.EmployeeValidator;
 import in.mohamedhalith.validator.LoginValidator;
 
@@ -29,6 +34,12 @@ public class EmployeeService {
 	LoginValidator loginValidator;
 	@Autowired
 	LeaveBalanceService leaveBalanceService;
+	@Autowired
+	EmployeeBeanConverter employeeBeanConverter;
+	@Autowired
+	UsernameUtil usernameUtil;
+	@Autowired
+	PasswordUtil passwordUtil;
 
 	/**
 	 * Constructor is made private to prevent creating object of the class
@@ -118,17 +129,19 @@ public class EmployeeService {
 	 * @param role     Role of the employee
 	 * @return boolean - True only if username,password and role are valid, false
 	 *         otherwise
-	 * @throws ServiceException When database related errors occurs
-	 * @throws ValidationException 
+	 * @throws ServiceException    When database related errors occurs
+	 * @throws ValidationException
 	 */
 	public AuthDTO findByUsernameAndPassword(LoginDTO user) throws ServiceException, ValidationException {
 		loginValidator.verifyCredentials(user);
 		try {
-			Employee employee = employeeDAO.findByUsernameAndPasswordAndRole(user.getUsername(), user.getPassword(), user.getRole());
+			Employee employee = employeeDAO.findByUsernameAndPasswordAndRole(user.getUsername(), user.getPassword(),
+					user.getRole());
 			AuthDTO loggedInUser;
-			if(employee != null) {
-				loggedInUser = new AuthDTO(employee.getName(),employee.getEmployeeId(),employee.getRole(),employee.getId());
-			}else {
+			if (employee != null) {
+				loggedInUser = new AuthDTO(employee.getName(), employee.getEmployeeId(), employee.getRole(),
+						employee.getId());
+			} else {
 				throw new ValidationException("Invalid credentials");
 			}
 			return loggedInUser;
@@ -267,5 +280,15 @@ public class EmployeeService {
 			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException("Unable to verify email id");
 		}
+	}
+
+	public void addBulkEmployees(List<EmployeeBean> employeeBeanList) {
+		List<Employee> employeeList = employeeBeanConverter.toEmployee(employeeBeanList);
+		for (Employee employee : employeeList) {
+			employee.setPassword(passwordUtil.generatePassword(employee.getName(), employee.getEmployeeId()));
+			employee.setUsername(usernameUtil.generateUsername(employee.getName(), employee.getEmployeeId()));
+			
+		}
+
 	}
 }

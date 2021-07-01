@@ -1,5 +1,9 @@
 package in.mohamedhalith.controller;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -11,9 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import in.mohamedhalith.constant.FieldConstants;
+import in.mohamedhalith.csv.EmployeeBean;
+import in.mohamedhalith.csv.EmployeeCsv;
 import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
 import in.mohamedhalith.model.Employee;
@@ -29,6 +37,8 @@ public class EmployeeController {
 	EmployeeService employeeService;
 	@Autowired
 	LeaveBalanceService leaveBalanceService;
+	@Autowired
+	EmployeeCsv employeeCsv;
 
 	private static final String EMPLOYEE_ID = FieldConstants.EMPLOYEE_ID;
 
@@ -68,5 +78,39 @@ public class EmployeeController {
 			message.setInfoMessage("Successfully removed employee");
 		}
 		return new ResponseEntity<>(message, HttpStatus.OK);
+	}
+
+	@PostMapping("import/csv")
+	public void importFile(@RequestParam("file") MultipartFile file) {
+		System.out.println(file.getOriginalFilename());
+		if (!file.isEmpty()) {
+			try {
+				file.transferTo(Paths.get("D:\\files\\" + file.getOriginalFilename()));
+				List<EmployeeBean> employeeList = employeeCsv.readFile("D:\\files\\" + file.getOriginalFilename());
+				employeeService.addBulkEmployees(employeeList);
+				
+			} catch (IllegalStateException | IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("Empty");
+		}
+
+//		try {
+//			Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+//			
+//			CsvToBean csvReader = new CsvToBeanBuilder(reader).withType(EmployeeBean.class)
+//					.withIgnoreLeadingWhiteSpace(true).build();
+//			
+//			List<EmployeeBean> list = new ArrayList<>();
+//			for(EmployeeBean user: (Iterable<EmployeeBean>) csvReader) {
+//				list.add(user);
+//			}
+//			for (EmployeeBean employeeBean : list) {
+//				System.out.println(employeeBean);
+//			}
+//		} catch (IllegalStateException | IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 }
