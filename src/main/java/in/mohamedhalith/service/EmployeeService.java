@@ -35,7 +35,6 @@ public class EmployeeService {
 	@Autowired
 	LoginValidator loginValidator;
 	@Autowired
-<<<<<<< HEAD
 	LeaveBalanceService leaveBalanceService;
 	@Autowired
 	EmployeeBeanConverter employeeBeanConverter;
@@ -43,9 +42,8 @@ public class EmployeeService {
 	UsernameUtil usernameUtil;
 	@Autowired
 	PasswordUtil passwordUtil;
-=======
+	@Autowired
 	LeaveBalanceDAO leaveBalanceDAO;
->>>>>>> d132a36648055cb26bd6529955893e8fdc1d02c0
 
 	/**
 	 * Constructor is made private to prevent creating object of the class
@@ -173,11 +171,12 @@ public class EmployeeService {
 	 *                             provided
 	 */
 	public boolean addEmployee(Employee employee) throws ServiceException, ValidationException {
-		employee.setModifiedTime(LocalDateTime.now());
+		
 		String role = Role.EMPLOYEE.toString().toLowerCase();
 		// Default values for employees
 		employee.setRole(role);
 		employee.setStatus(true);
+		employee.setModifiedTime(LocalDateTime.now());
 		
 		employeeValidator.isValidEmployee(employee);
 		String errorMessage = "Unable to add employee";
