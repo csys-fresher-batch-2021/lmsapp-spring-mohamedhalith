@@ -6,8 +6,6 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +18,6 @@ import in.mohamedhalith.model.Employee;
 import in.mohamedhalith.model.LeaveBalance;
 import in.mohamedhalith.service.EmployeeService;
 import in.mohamedhalith.service.LeaveBalanceService;
-import in.mohamedhalith.util.Message;
 
 @RestController
 public class EmployeeController {
@@ -38,12 +35,12 @@ public class EmployeeController {
 	}
 
 	@PostMapping("AddEmployeeServlet")
-	public ResponseEntity<Message> addEmployee(@RequestBody Employee employee)
+	public boolean addEmployee(@RequestBody Employee employee)
 			throws ServiceException, ValidationException {
-		Message message = new Message();
-		employeeService.addEmployee(employee);
-		message.setInfoMessage("Successfully added employee");
-		return new ResponseEntity<>(message, HttpStatus.OK);
+//		Message message = new Message();
+		return employeeService.addEmployee(employee);
+//		message.setInfoMessage("Successfully added employee");
+//		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@GetMapping("EmployeeDetailsServlet")
@@ -60,13 +57,13 @@ public class EmployeeController {
 	}
 
 	@GetMapping("RemoveEmployeeServlet")
-	public ResponseEntity<Message> remove(@Param(EMPLOYEE_ID) int employeeId)
+	public boolean remove(@Param(EMPLOYEE_ID) int employeeId)
 			throws ValidationException, ServiceException {
-		Message message = new Message();
-		boolean isRemoved = employeeService.removeEmployee(employeeId);
-		if (isRemoved) {
-			message.setInfoMessage("Successfully removed employee");
-		}
-		return new ResponseEntity<>(message, HttpStatus.OK);
+//		Message message = new Message();
+		return employeeService.removeEmployee(employeeId);
+//		if (isRemoved) {
+//			message.setInfoMessage("Successfully removed employee");
+//		}
+//		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 }

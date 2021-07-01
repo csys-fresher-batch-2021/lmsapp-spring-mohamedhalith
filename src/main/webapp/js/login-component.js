@@ -36,11 +36,19 @@ function login() {
 			data = JSON.stringify(data);
 			localStorage.setItem("LOGGED_IN_USER", data);
 			setTimeout(function() {
-				window.location.href = "index.jsp"; 
+				window.location.href = "index.jsp";
 			}, 1000);
 		}
 	}).catch(err => {
-		console.log(err);
-		toastr.error("Invalid credentials");
+		let data = error.response.data;
+		if (data.errors != null) {
+			let listOfErrors = data.errors;
+			for (let error of listOfErrors) {
+				toastr.error(error);
+			}
+		} else {
+			console.log(err);
+			toastr.error("Invalid credentials");
+		}
 	});
 }
