@@ -2,7 +2,6 @@ package in.mohamedhalith.csv;
 
 import java.time.LocalDate;
 
-import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvBindByPosition;
 import com.opencsv.bean.CsvDate;
 
@@ -25,18 +24,4 @@ public class EmployeeBean {
 	@CsvBindByPosition(position = 4 , required = true)
 	private LocalDate joinedDate;
 	
-//	@CsvBindByName(column = "employeeId")
-//	private int employeeId;
-//	@CsvBindByName(column = "name")
-//	private String name;
-//	
-//	@CsvBindByName(column = "mobileNumber")
-//	private long mobileNumber;
-//	@CsvBindByName(column = "email")
-//	private String email;
-//	
-//	@CsvDate(value = "dd-MM-yyyy")
-//	@CsvBindByName(column = "joinedDate")
-//	private LocalDate joinedDate;
-
 }

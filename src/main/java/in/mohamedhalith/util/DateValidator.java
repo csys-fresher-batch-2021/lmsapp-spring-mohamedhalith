@@ -34,7 +34,7 @@ public class DateValidator {
 		LocalDate today = LocalDate.now();
 		LocalDate minDate = today.minusDays(30);
 		if (joinedDate.isAfter(today) || joinedDate.isBefore(minDate)) {
-			throw new ValidationException("Invalid Joined Date");
+			throw new ValidationException("Joined Date should be within 30 days from today");
 		}
 	}
 }

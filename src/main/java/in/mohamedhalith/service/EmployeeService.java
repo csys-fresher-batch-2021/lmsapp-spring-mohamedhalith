@@ -171,15 +171,16 @@ public class EmployeeService {
 	 *                             provided
 	 */
 	public boolean addEmployee(Employee employee) throws ServiceException, ValidationException {
-		
+
 		String role = Role.EMPLOYEE.toString().toLowerCase();
 		// Default values for employees
 		employee.setRole(role);
 		employee.setStatus(true);
 		employee.setModifiedTime(LocalDateTime.now());
-		
+
 		employeeValidator.isValidEmployee(employee);
 		String errorMessage = "Unable to add employee";
+
 		// If isAdded is false, performed operation is not expected operation
 		boolean isAdded;
 		try {
@@ -290,13 +291,27 @@ public class EmployeeService {
 		}
 	}
 
-	public void addBulkEmployees(List<EmployeeBean> employeeBeanList) {
+	/**
+	 * This method is used to import a no. of employees from CSV file. A list of
+	 * EmployeeBean objects is given as input parameter
+	 * 
+	 * @param employeeBeanList List of EmployeeBean containing employee details
+	 * @return - true if all employees are added successfully
+	 * @throws ServiceException    When database related error occurs
+	 * @throws ValidationException if null,empty or any invalid type of input is
+	 *                             given
+	 */
+	public List<String> importEmployees(List<EmployeeBean> employeeBeanList)
+			throws ServiceException, ValidationException {
 		List<Employee> employeeList = employeeBeanConverter.toEmployee(employeeBeanList);
-		for (Employee employee : employeeList) {
-			employee.setPassword(passwordUtil.generatePassword(employee.getName(), employee.getEmployeeId()));
-			employee.setUsername(usernameUtil.generateUsername(employee.getName(), employee.getEmployeeId()));
-			
+		employeeList = passwordUtil.generatePassword(employeeList);
+		employeeList = usernameUtil.generateUsername(employeeList);
+		List<String> errorMessageList = employeeValidator.isValidEmployees(employeeList);
+		if (errorMessageList.isEmpty()) {
+			for (Employee employee : employeeList) {
+				addEmployee(employee);
+			}
 		}
-
+		return errorMessageList;
 	}
 }

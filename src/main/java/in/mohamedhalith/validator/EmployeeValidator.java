@@ -1,5 +1,8 @@
 package in.mohamedhalith.validator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -67,11 +70,12 @@ public class EmployeeValidator {
 	 * @throws ServiceException    When database related exceptions occur
 	 */
 	public void isValidEmployee(Employee employee) throws ValidationException, ServiceException {
+		NumberValidator.isValidEmployeeId(employee.getEmployeeId());
+		NumberValidator.isValidMobileNumber(employee.getMobileNumber());
 		StringValidator.isValidName(employee.getName());
 		StringValidator.isValidEmail(employee.getEmail());
 		StringValidator.isValidPassword(employee.getPassword());
 		StringValidator.isValidUsername(employee.getUsername());
-		NumberValidator.isValidMobileNumber(employee.getMobileNumber());
 		Integer id = employeeService.exists(employee.getEmployeeId());
 		if (id != null) {
 			throw new ValidationException("Employee Id already exists");
@@ -85,5 +89,25 @@ public class EmployeeValidator {
 			throw new ValidationException("Email Id already exists");
 		}
 		DateValidator.isValidJoinedDate(employee.getJoinedDate());
+	}
+	
+	public List<String> isValidEmployees(List<Employee> employeeList)  {
+		List<String> errorMessageList = new ArrayList<>();
+		for (Employee employee : employeeList) {
+			try {
+				NumberValidator.isValidEmployeeId(employee.getEmployeeId());
+				NumberValidator.isValidMobileNumber(employee.getMobileNumber());
+				StringValidator.isValidName(employee.getName());
+				StringValidator.isValidEmail(employee.getEmail());
+				StringValidator.isValidPassword(employee.getPassword());
+				StringValidator.isValidUsername(employee.getUsername());
+			} catch (ValidationException e) {
+				StringBuilder errorMessage = new StringBuilder();
+				errorMessage.append(e.getMessage()).append("-EmployeeId: ").append(employee.getEmployeeId());;
+				errorMessage.append(" Name: ").append(employee.getName());
+				errorMessageList.add(errorMessage.toString());
+			}
+		}
+		return errorMessageList;
 	}
 }

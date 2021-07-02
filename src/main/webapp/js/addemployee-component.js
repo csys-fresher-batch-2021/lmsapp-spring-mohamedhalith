@@ -86,3 +86,36 @@ function add() {
 		toastr.error(err.response.data.errorMessage);
 	});
 }
+
+/**
+	This method is used to upload a csv file containing employee details
+ */
+function upload() {
+	event.preventDefault();
+	let form = document.getElementById("form");
+	let formData = new FormData(form);
+	$.ajax({
+		url: "import/csv",
+		type: 'POST',
+		data: formData,
+		processData: false,
+		contentType: false,
+		success: function(resultMessage) {
+			if (resultMessage == null) {
+				toastr.success("Employees added successfully");
+				setTimeout(function() {
+					window.location.href = "addemployee.jsp";
+				}, 1500);
+			} else {
+				if (window.confirm("Errors found in file\nDo you want to download errors as file")) {
+					let blob = new Blob(resultMessage, { type: "text/plain;charset=utf-8" });
+					saveAs(blob, "errorsInFile.txt");
+				}
+			}
+		},
+		error: function(err) {
+			let error = JSON.parse(err.responseText);
+			toastr.error(error.errorMessage);
+		}
+	});
+}

@@ -47,10 +47,7 @@ public class EmployeeController {
 	@PostMapping("AddEmployeeServlet")
 	public boolean addEmployee(@RequestBody Employee employee)
 			throws ServiceException, ValidationException {
-//		Message message = new Message();
 		return employeeService.addEmployee(employee);
-//		message.setInfoMessage("Successfully added employee");
-//		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@GetMapping("EmployeeDetailsServlet")
@@ -69,45 +66,24 @@ public class EmployeeController {
 	@GetMapping("RemoveEmployeeServlet")
 	public boolean remove(@Param(EMPLOYEE_ID) int employeeId)
 			throws ValidationException, ServiceException {
-//		Message message = new Message();
 		return employeeService.removeEmployee(employeeId);
-//		if (isRemoved) {
-//			message.setInfoMessage("Successfully removed employee");
-//		}
-//		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 
 	@PostMapping("import/csv")
-	public void importFile(@RequestParam("file") MultipartFile file) {
-		System.out.println(file.getOriginalFilename());
+	public List<String> importFile(@RequestParam("file") MultipartFile file) throws ServiceException, ValidationException {
+		List<String> importEmployees = null;
 		if (!file.isEmpty()) {
 			try {
+				// Transferring the file obtained to a familiar path
 				file.transferTo(Paths.get("D:\\files\\" + file.getOriginalFilename()));
+				// Converting Comma Separated Values into EmployeeBean object 
 				List<EmployeeBean> employeeList = employeeCsv.readFile("D:\\files\\" + file.getOriginalFilename());
-				employeeService.addBulkEmployees(employeeList);
-				
+				// Adding the employees into the records
+				importEmployees = employeeService.importEmployees(employeeList);
 			} catch (IllegalStateException | IOException e) {
 				e.printStackTrace();
 			}
-		} else {
-			System.out.println("Empty");
 		}
-
-//		try {
-//			Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-//			
-//			CsvToBean csvReader = new CsvToBeanBuilder(reader).withType(EmployeeBean.class)
-//					.withIgnoreLeadingWhiteSpace(true).build();
-//			
-//			List<EmployeeBean> list = new ArrayList<>();
-//			for(EmployeeBean user: (Iterable<EmployeeBean>) csvReader) {
-//				list.add(user);
-//			}
-//			for (EmployeeBean employeeBean : list) {
-//				System.out.println(employeeBean);
-//			}
-//		} catch (IllegalStateException | IOException e) {
-//			e.printStackTrace();
-//		}
+		return importEmployees;
 	}
 }

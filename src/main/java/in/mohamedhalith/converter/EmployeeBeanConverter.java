@@ -17,7 +17,7 @@ public class EmployeeBeanConverter {
 		employee.setEmployeeId(employeeBean.getEmployeeId());
 		employee.setMobileNumber(employeeBean.getMobileNumber());
 		employee.setEmail(employeeBean.getEmail());
-		employee.setJoinedDate(employee.getJoinedDate());
+		employee.setJoinedDate(employeeBean.getJoinedDate());
 		return employee;
 	}
 	

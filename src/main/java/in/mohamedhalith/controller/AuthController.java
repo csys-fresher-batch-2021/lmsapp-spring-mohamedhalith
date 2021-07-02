@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +29,7 @@ public class AuthController {
 	LoginValidator loginValidator;
 
 	@PostMapping("LoginServlet")
-	public AuthDTO login(@Valid @RequestBody LoginDTO user, HttpServletRequest request)
+	public AuthDTO login(@RequestBody LoginDTO user, HttpServletRequest request)
 			throws ServiceException, ValidationException {
 		AuthDTO loggedIn  = employeeService.findByUsernameAndPassword(user);
 		if (loggedIn != null) {

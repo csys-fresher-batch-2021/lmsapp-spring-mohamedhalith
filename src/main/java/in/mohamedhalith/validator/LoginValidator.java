@@ -5,10 +5,8 @@ import org.springframework.stereotype.Component;
 
 import in.mohamedhalith.constant.Role;
 import in.mohamedhalith.dto.LoginDTO;
-import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
 import in.mohamedhalith.service.EmployeeService;
-import in.mohamedhalith.util.StringValidator;
 
 @Component
 public class LoginValidator {
@@ -19,28 +17,19 @@ public class LoginValidator {
 
 	@Autowired
 	EmployeeService employeeService;
+
 	/**
 	 * This method is used to verify whether the user's credentials are valid and
 	 * also user is the admin of the system.
 	 * 
 	 * Returns True if the credentials are correct.
 	 * 
-	 * @param username
-	 * @param password
-	 * @param role
-	 * @return 
-	 * @return boolean
-	 * @throws ValidationException
-	 * @throws ServiceException 
+	 * @param user user credentials
+	 * @throws ValidationException When user credentials is invalid
 	 */
 	public void verifyCredentials(LoginDTO user) throws ValidationException {
-		String username = user.getUsername();
-		String password = user.getPassword();
 		String role = user.getRole();
-		
-		StringValidator.isValidUsername(username);
-		StringValidator.isValidPassword(password);
-		StringValidator.isValidString(role);
+
 		if (!role.equalsIgnoreCase(Role.EMPLOYEE.toString()) && !role.equalsIgnoreCase(Role.MANAGER.toString())) {
 			throw new ValidationException("Invalid credentials");
 		}
