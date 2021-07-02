@@ -1,12 +1,15 @@
 package in.mohamedhalith.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import in.mohamedhalith.constant.Role;
+import in.mohamedhalith.converter.EmployeeBeanConverter;
+import in.mohamedhalith.csv.EmployeeBean;
 import in.mohamedhalith.dao.EmployeeRepository;
 import in.mohamedhalith.dao.LeaveBalanceDAO;
 import in.mohamedhalith.dto.AuthDTO;
@@ -15,7 +18,9 @@ import in.mohamedhalith.exception.ServiceException;
 import in.mohamedhalith.exception.ValidationException;
 import in.mohamedhalith.model.Employee;
 import in.mohamedhalith.util.NumberValidator;
+import in.mohamedhalith.util.PasswordUtil;
 import in.mohamedhalith.util.StringValidator;
+import in.mohamedhalith.util.UsernameUtil;
 import in.mohamedhalith.validator.EmployeeValidator;
 import in.mohamedhalith.validator.LoginValidator;
 
@@ -29,6 +34,14 @@ public class EmployeeService {
 	EmployeeValidator employeeValidator;
 	@Autowired
 	LoginValidator loginValidator;
+	@Autowired
+	LeaveBalanceService leaveBalanceService;
+	@Autowired
+	EmployeeBeanConverter employeeBeanConverter;
+	@Autowired
+	UsernameUtil usernameUtil;
+	@Autowired
+	PasswordUtil passwordUtil;
 	@Autowired
 	LeaveBalanceDAO leaveBalanceDAO;
 
@@ -120,17 +133,19 @@ public class EmployeeService {
 	 * @param role     Role of the employee
 	 * @return boolean - True only if username,password and role are valid, false
 	 *         otherwise
-	 * @throws ServiceException When database related errors occurs
-	 * @throws ValidationException 
+	 * @throws ServiceException    When database related errors occurs
+	 * @throws ValidationException
 	 */
 	public AuthDTO findByUsernameAndPassword(LoginDTO user) throws ServiceException, ValidationException {
 		loginValidator.verifyCredentials(user);
 		try {
-			Employee employee = employeeDAO.findByUsernameAndPasswordAndRole(user.getUsername(), user.getPassword(), user.getRole());
+			Employee employee = employeeDAO.findByUsernameAndPasswordAndRole(user.getUsername(), user.getPassword(),
+					user.getRole());
 			AuthDTO loggedInUser;
-			if(employee != null) {
-				loggedInUser = new AuthDTO(employee.getName(),employee.getEmployeeId(),employee.getRole(),employee.getId());
-			}else {
+			if (employee != null) {
+				loggedInUser = new AuthDTO(employee.getName(), employee.getEmployeeId(), employee.getRole(),
+						employee.getId());
+			} else {
 				throw new ValidationException("Invalid credentials");
 			}
 			return loggedInUser;
@@ -156,14 +171,16 @@ public class EmployeeService {
 	 *                             provided
 	 */
 	public boolean addEmployee(Employee employee) throws ServiceException, ValidationException {
-		employee.setModifiedTime(LocalDateTime.now());
+
 		String role = Role.EMPLOYEE.toString().toLowerCase();
 		// Default values for employees
 		employee.setRole(role);
 		employee.setStatus(true);
-		
+		employee.setModifiedTime(LocalDateTime.now());
+
 		employeeValidator.isValidEmployee(employee);
 		String errorMessage = "Unable to add employee";
+
 		// If isAdded is false, performed operation is not expected operation
 		boolean isAdded;
 		try {
@@ -272,5 +289,29 @@ public class EmployeeService {
 			// Exceptions faced during the query is captured and handled as ServiceException
 			throw new ServiceException("Unable to verify email id");
 		}
+	}
+
+	/**
+	 * This method is used to import a no. of employees from CSV file. A list of
+	 * EmployeeBean objects is given as input parameter
+	 * 
+	 * @param employeeBeanList List of EmployeeBean containing employee details
+	 * @return - true if all employees are added successfully
+	 * @throws ServiceException    When database related error occurs
+	 * @throws ValidationException if null,empty or any invalid type of input is
+	 *                             given
+	 */
+	public List<String> importEmployees(List<EmployeeBean> employeeBeanList)
+			throws ServiceException, ValidationException {
+		List<Employee> employeeList = employeeBeanConverter.toEmployee(employeeBeanList);
+		employeeList = passwordUtil.generatePassword(employeeList);
+		employeeList = usernameUtil.generateUsername(employeeList);
+		List<String> errorMessageList = employeeValidator.isValidEmployees(employeeList);
+		if (errorMessageList.isEmpty()) {
+			for (Employee employee : employeeList) {
+				addEmployee(employee);
+			}
+		}
+		return errorMessageList;
 	}
 }

@@ -39,16 +39,8 @@ function login() {
 				window.location.href = "index.jsp";
 			}, 1000);
 		}
-	}).catch(err => {
+	}).catch(error => {
 		let data = error.response.data;
-		if (data.errors != null) {
-			let listOfErrors = data.errors;
-			for (let error of listOfErrors) {
-				toastr.error(error);
-			}
-		} else {
-			console.log(err);
-			toastr.error("Invalid credentials");
-		}
+		toastr.error(data.errorMessage);
 	});
 }

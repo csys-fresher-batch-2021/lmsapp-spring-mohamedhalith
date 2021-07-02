@@ -14,6 +14,7 @@
 <script src="assets/js/jquery-1.9.1.min.js"></script>
 <script src="assets/js/jquery-migrate-1.2.1.min.js"></script>
 <script src="assets/js/toastr.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.js"></script>
 <script src="js/header-component.js"></script>
 <header>
 	<c:set var="username" value="${sessionScope.LOGGEDIN_USERNAME}"></c:set>
